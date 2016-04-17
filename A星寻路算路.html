@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>A*寻路算法</title>
+</head>
+<style>
+    ul { margin:0 auto; padding:0; overflow:hidden; border:solid 1px #999; border-right:none; border-bottom:none; }
+    li { padding:0; list-style:none; border:solid 1px #999; border-left:none; border-top:none; float:left; }
+    input { width:100px; position:absolute; left:50%; margin-left:-50px; }
+    .z_1 { background:red; }
+    .z_2 { background:green; }
+    .z_3 { background:blue; }
+</style>
+<script>
+    window.onload = function(){
+        var oUl = document.getElementById('ul');
+        var aLi = oUl.getElementsByTagName('li');
+        var oInp = document.getElementById('inp');
+        var startNode = document.getElementsByClassName('z_1');
+        var endNode = document.getElementsByClassName('z_2');
+        var sizeGrid = 20;
+        var openArr = [];
+        var closeArr = [];
+        init();
+        function init (){
+            createMap();
+            oInp.onclick = function(){
+                openFn();
+            }
+        }
+        function createMap(){
+            var map = [
+                0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,3,3,3,3,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,1,0,0,0,0,3,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,3,3,0,0,3,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,3,3,0,0,3,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,3,0,3,0,0,0,2,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,3,0,3,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+            ];
+            var cols = Math.sqrt(map.length);
+            for(var i=0; i<map.length; i++){
+                var oLi = document.createElement('li');
+                oLi.style.width = 20 + 'px';
+                oLi.style.height = 20 + 'px';
+                oUl.appendChild(oLi);
+                if(map[i] == 1 ){
+                    oLi.className = 'z_1';
+                    openArr.push(oLi);
+                }else if(map[i] == 2){
+                    oLi.className = 'z_2';
+                }else if(map[i] == 3) {
+                    oLi.className = 'z_3'
+                    closeArr.push(oLi);
+                }
+            }
+            oUl.style.width = (cols * (sizeGrid + 1)) + 'px';
+        }
+        function openFn(){
+            var nowNode = openArr.shift();
+            if(nowNode == endNode[0]){
+                showLine();
+                return;
+            }
+            closeFn(nowNode);
+            findNode(nowNode);
+            openArr.sort(function(li1,li2){
+                return li1.num - li2.num;
+            });
+            openFn();
+        }
+        /* 寻找li */
+        function findNode(node){
+            var result = [];
+            for(var i=0; i<aLi.length; i++){
+                if(filter(aLi[i])){
+                    result.push(aLi[i]);
+                }
+            }
+            /* 过滤 关闭队列中的li */
+            function filter(filNode){
+                for(var i = 0; i < closeArr.length; i++){
+                    if(filNode == closeArr[i]){
+                        return false;
+                    }
+                }
+                for(var i = 0; i < openArr.length; i++){
+                    if(filNode == openArr[i]){
+                        return false;
+                    }
+                }
+                return true;
+            }
+            /* 找到result中node周围的节点 */
+            for(var i = 0; i < result.length; i++){
+                if((Math.abs(node.offsetLeft - result[i].offsetLeft) <= sizeGrid + 1) && (Math.abs(node.offsetTop - result[i].offsetTop) <= sizeGrid + 1) ){
+                    openArr.push(result[i]);
+                    result[i].num = f(result[i]);
+                    result[i].parent = node;
+                }
+            }
+            //console.log(openArr);
+
+        }
+        function closeFn(nowNode){
+            closeArr.push(nowNode);
+        }
+        function showLine(){
+            var result = [];
+            var lastNode = closeArr.pop();
+            var iNow = 0;
+            findParent(lastNode);
+            function findParent(node){
+                result.unshift(node);
+                if(node.parent == startNode[0]){
+                    return;
+                }
+                findParent(node.parent);
+            }
+
+            var timer = setInterval(function(){
+                result[iNow].style.background = 'red';
+                iNow++;
+                if(iNow==result.length){
+                    clearInterval(timer);
+                }
+            },500);
+        }
+        function f(node){
+            return h(node) + g(node);
+        }
+        function h(node){
+            var a = endNode[0].offsetLeft - node.offsetLeft;
+            var b = endNode[0].offsetTop - node.offsetTop;
+            return Math.sqrt(a*a + b*b);
+        }
+        function g(node){
+            var a = startNode[0].offsetLeft - node.offsetLeft;
+            var b = startNode[0].offsetTop - node.offsetTop;
+            return Math.sqrt(a*a + b*b);
+        }
+    }
+</script>
+<body>
+<ul id="ul">
+
+</ul>
+<input type="button" id="inp" value="开始寻路"/>
+</body>
+</html>
