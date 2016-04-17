@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>八皇后</title>
+</head>
+
+<style>
+    ul { margin:0 auto; padding:0; overflow:hidden; border:solid 1px #999; border-right:none; border-bottom:none; }
+    li { padding:0; list-style:none; border:solid 1px #999; border-left:none; border-top:none; float:left; }
+</style>
+<body>
+<ul id="ul">
+
+</ul>
+</body>
+</html>
+
+<script>
+    var oUl = document.getElementById('ul');
+    var sizeGrid = 50;
+    var num = 8;
+    init();
+    function init(){
+        createMap();
+    }
+    function createMap(){
+        var length = num * num;
+
+        for(var i=0; i<length; i++){
+            var oLi = document.createElement('li');
+            oLi.style.width = 50 + 'px';
+            oLi.style.height = 50 + 'px';
+            oUl.appendChild(oLi);
+        }
+        oUl.style.width = (num * ( sizeGrid + 1) + 1) +  'px';
+    }
+</script>
